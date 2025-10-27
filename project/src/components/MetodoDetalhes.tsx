@@ -39,6 +39,14 @@ const MetodoDetalhes = () => {
   const apostasGanhas = apostasDoMetodo.filter((a) => a.resultado === 'green');
   const apostasPerdidas = apostasDoMetodo.filter((a) => a.resultado === 'red');
 
+  const condicoes = metodo.condicoes || [];
+  const parametrosIA = metodo.parametrosIA || {
+    sensibilidade: 0.5,
+    minimoValorEsperado: 0.1,
+    confiancaMinima: 0.5,
+  };
+  const notificacoesAtivas = metodo.notificacoesAtivas ?? true;
+
   const calcularLucroAcumulado = () => {
     let lucroAcumulado = 0;
     return apostasDoMetodo
@@ -85,6 +93,67 @@ const MetodoDetalhes = () => {
           <ArrowLeft className="w-6 h-6" />
         </button>
         <h2 className="text-2xl font-bold text-gray-800">{metodo.nome}</h2>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-sm font-medium text-gray-500">Tipo de estratégia</h3>
+          <p className="text-xl font-semibold text-gray-900 mt-2 capitalize">
+            {metodo.tipo === 'ao-vivo' ? 'Ao vivo' : metodo.tipo === 'pre-live' ? 'Pré-jogo' : 'Híbrido'}
+          </p>
+          <p className="text-sm text-gray-500 mt-3">
+            Notificações automáticas {notificacoesAtivas ? 'ativadas' : 'desativadas'}.
+          </p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-sm font-medium text-gray-500">Parâmetros de IA</h3>
+          <ul className="mt-3 space-y-2 text-gray-700 text-sm">
+            <li>Sensibilidade: {(parametrosIA.sensibilidade * 100).toFixed(0)}%</li>
+            <li>Valor mínimo: {(parametrosIA.minimoValorEsperado * 100).toFixed(0)}%</li>
+            <li>Confiança mínima: {(parametrosIA.confiancaMinima * 100).toFixed(0)}%</li>
+          </ul>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-sm font-medium text-gray-500">Configurações gerais</h3>
+          <p className="text-sm text-gray-600 mt-2">
+            Mercado preferencial:{' '}
+            {metodo.mercadoPreferencial ? metodo.mercadoPreferencial : 'não especificado'}
+          </p>
+          {parametrosIA.comentario && (
+            <p className="text-sm text-gray-600 mt-2">Comentário padrão: {parametrosIA.comentario}</p>
+          )}
+        </div>
+      </div>
+
+      {metodo.descricao && (
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">Resumo da estratégia</h3>
+          <p className="text-gray-600">{metodo.descricao}</p>
+        </div>
+      )}
+
+      <div className="bg-white p-6 rounded-lg shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Condições configuradas</h3>
+        {condicoes.length ? (
+          <div className="space-y-3">
+            {condicoes.map((condicao) => (
+              <div
+                key={condicao.id}
+                className="border border-blue-200 bg-blue-50 rounded-lg p-4 text-sm text-gray-700"
+              >
+                <p className="font-medium text-blue-700">
+                  {condicao.campo.replace(/_/g, ' ')} {condicao.operador} {condicao.valor}
+                  {condicao.valorSecundario ? ` e ${condicao.valorSecundario}` : ''}
+                </p>
+                {condicao.descricao && (
+                  <p className="mt-2 text-gray-600">{condicao.descricao}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500">Nenhuma condição cadastrada para esta estratégia.</p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

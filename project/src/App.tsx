@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { BarChart3, BookOpen, Settings, PlusCircle, History, Wallet, Menu, X, LogOut, FileText } from 'lucide-react';
+import { BarChart3, BookOpen, Settings, PlusCircle, History, Wallet, Menu, X, LogOut, FileText, Activity, Clock } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import NovaAposta from './components/NovaAposta';
 import NovoMetodo from './components/NovoMetodo';
@@ -12,6 +12,8 @@ import Historico from './components/Historico';
 import Login from './components/Login';
 import Termos from './components/Termos';
 import ProtectedRoute from './components/ProtectedRoute';
+import JogosAoVivo from './components/JogosAoVivo';
+import PreJogos from './components/PreJogos';
 import useBancaStore from './store/bancaStore';
 import useAuthStore from './store/authStore';
 
@@ -62,6 +64,22 @@ function Sidebar() {
           >
             <BarChart3 className="w-5 h-5 mr-3" />
             Dashboard
+          </Link>
+          <Link
+            to="/ao-vivo"
+            className={`flex items-center px-4 py-3 ${isActive('/ao-vivo')}`}
+            onClick={() => setIsOpen(false)}
+          >
+            <Activity className="w-5 h-5 mr-3" />
+            Jogos ao vivo
+          </Link>
+          <Link
+            to="/pre-jogos"
+            className={`flex items-center px-4 py-3 ${isActive('/pre-jogos')}`}
+            onClick={() => setIsOpen(false)}
+          >
+            <Clock className="w-5 h-5 mr-3" />
+            Pré-jogos
           </Link>
           <Link
             to="/metodos"
@@ -149,6 +167,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ao-vivo"
+              element={
+                <ProtectedRoute>
+                  <JogosAoVivo />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/pre-jogos"
+              element={
+                <ProtectedRoute>
+                  <PreJogos />
                 </ProtectedRoute>
               }
             />
