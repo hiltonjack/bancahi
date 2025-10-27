@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import useBancaStore from '../store/bancaStore';
 import useAuthStore from '../store/authStore';
 import { format } from 'date-fns';
@@ -81,7 +81,8 @@ const Configuracoes = () => {
     doc.text(`Taxa de Acerto: ${taxaAcerto}%`, 14, 54);
     
     // Tabela de apostas
-    const tableData = apostas.map(aposta => {
+    type TabelaAposta = [string, string, string, string, string];
+    const tableData: TabelaAposta[] = apostas.map((aposta) => {
       const metodo = metodos.find(m => m.id === aposta.metodo);
       return [
         format(new Date(aposta.data), 'dd/MM/yyyy'),
@@ -91,13 +92,13 @@ const Configuracoes = () => {
         aposta.resultado === 'green' ? 'Ganhou' : 'Perdeu'
       ];
     });
-    
-    (doc as any).autoTable({
+
+    autoTable(doc, {
       startY: 65,
       head: [['Data', 'Método', 'Stake', 'Odd', 'Resultado']],
       body: tableData,
       theme: 'striped',
-      headStyles: { fillColor: [37, 99, 235] }
+      headStyles: { fillColor: [37, 99, 235] },
     });
     
     doc.save(`relatorio-apostas-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
@@ -288,12 +289,13 @@ const Configuracoes = () => {
                 const file = e.target.files?.[0];
                 if (file) {
                   const reader = new FileReader();
-                  reader.onload = (e) => {
+                  reader.onload = (evento) => {
                     try {
-                      const dados = JSON.parse(e.target?.result as string);
+                      const dados = JSON.parse(evento.target?.result as string);
                       localStorage.setItem('banca-storage', JSON.stringify(dados));
                       window.location.reload();
-                    } catch (error) {
+                    } catch (err) {
+                      console.error('Erro ao importar dados', err);
                       alert('Erro ao importar dados');
                     }
                   };

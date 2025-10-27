@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, TrendingUp, BarChart2, Trash2, Edit } from 'lucide-react';
+import { BookOpen, TrendingUp, BarChart2, Trash2, Edit, Target, CheckCircle2 } from 'lucide-react';
 import useBancaStore from '../store/bancaStore';
 
 const Metodos = () => {
@@ -40,17 +40,47 @@ const Metodos = () => {
       <div className="grid grid-cols-1 gap-6">
         {metodos.map((metodo) => {
           const stats = calcularEstatisticasMetodo(metodo.id);
+          const condicoes = metodo.condicoes || [];
+          const parametrosIA = metodo.parametrosIA || {
+            sensibilidade: 0.5,
+            minimoValorEsperado: 0.1,
+            confiancaMinima: 0.5,
+          };
           return (
             <div
               key={metodo.id}
               className="bg-white p-6 rounded-lg shadow-sm space-y-4"
             >
               <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-800">
-                    {metodo.nome}
-                  </h3>
-                  <p className="text-gray-600 mt-1">{metodo.descricao}</p>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      {metodo.nome}
+                    </h3>
+                    <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 capitalize">
+                      {metodo.tipo === 'ao-vivo'
+                        ? 'Ao vivo'
+                        : metodo.tipo === 'pre-live'
+                        ? 'Pré-jogo'
+                        : 'Híbrido'}
+                    </span>
+                  </div>
+                  {metodo.descricao && (
+                    <p className="text-gray-600">{metodo.descricao}</p>
+                  )}
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                    <span className="flex items-center space-x-1">
+                      <Target className="w-4 h-4" />
+                      <span>{condicoes.length} condições</span>
+                    </span>
+                    <span className="flex items-center space-x-1">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Sensibilidade IA {(parametrosIA.sensibilidade * 100).toFixed(0)}%</span>
+                    </span>
+                    {metodo.mercadoPreferencial && (
+                      <span>Mercado: {metodo.mercadoPreferencial}</span>
+                    )}
+                  </div>
                 </div>
                 <div className="flex space-x-2">
                   <button
@@ -111,6 +141,26 @@ const Metodos = () => {
                     </p>
                   </div>
                 </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">Condições configuradas</h4>
+                {condicoes.length ? (
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    {condicoes.map((condicao) => (
+                      <li key={condicao.id} className="flex items-start space-x-2">
+                        <span className="mt-1 w-2 h-2 rounded-full bg-blue-500" />
+                        <span>
+                          <strong>{condicao.campo.replace(/_/g, ' ')}:</strong> {condicao.operador} {condicao.valor}
+                          {condicao.valorSecundario ? ` / ${condicao.valorSecundario}` : ''}
+                          {condicao.descricao ? ` – ${condicao.descricao}` : ''}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-500">Nenhuma condição cadastrada.</p>
+                )}
               </div>
 
               <div className="flex justify-between items-center pt-4 border-t">
