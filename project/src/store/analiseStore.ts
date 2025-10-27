@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import {
   AlertaAnalise,
-  Metodo,
   PartidaAnalise,
   ResultadoMetodoPartida,
 } from '../types';

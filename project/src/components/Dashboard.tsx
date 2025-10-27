@@ -3,7 +3,6 @@ import { TrendingUp, TrendingDown, Star, ArrowUpRight, Calculator } from 'lucide
 import { useNavigate } from 'react-router-dom';
 import useBancaStore from '../store/bancaStore';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,15 +18,30 @@ const simuladorSchema = z.object({
 
 type SimuladorFormData = z.infer<typeof simuladorSchema>;
 
+interface PontoGraficoSimulacao {
+  mes: number;
+  lucro: number;
+  minimo: number;
+  maximo: number;
+}
+
+interface ResultadoSimulacao {
+  lucroBase: number;
+  desvioMinimo: number;
+  desvioMaximo: number;
+  aproveitamento: number;
+  oddMedia: number;
+  dadosGrafico: PontoGraficoSimulacao[];
+}
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { banca, apostas, metodos, configuracoes, atualizarConfiguracoes } = useBancaStore();
-  const [simulacaoResultado, setSimulacaoResultado] = useState<any>(null);
+  const [simulacaoResultado, setSimulacaoResultado] = useState<ResultadoSimulacao | null>(null);
 
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<SimuladorFormData>({
     resolver: zodResolver(simuladorSchema),
@@ -134,11 +148,9 @@ const Dashboard = () => {
 
   const calcularOddMediaMetodo = (metodoId: string) => {
     const apostasDoMetodo = apostas.filter(a => a.metodo === metodoId);
-    return apostasDoMetodo.reduce((acc, aposta) => acc + (aposta.odd || 1), 0) / 
+    return apostasDoMetodo.reduce((acc, aposta) => acc + (aposta.odd || 1), 0) /
       (apostasDoMetodo.length || 1);
   };
-
-  const watchedValues = watch();
 
   const calcularLucroEstimado = (data: SimuladorFormData) => {
     const aproveitamento = calcularAproveitamentoMetodo(data.metodoId);
@@ -177,7 +189,10 @@ const Dashboard = () => {
   const onSubmitSimulador = (data: SimuladorFormData) => {
     const resultados = calcularLucroEstimado(data);
     const dadosGrafico = gerarDadosGraficoSimulacao(data);
-    setSimulacaoResultado({ ...resultados, dadosGrafico });
+    setSimulacaoResultado({
+      ...resultados,
+      dadosGrafico,
+    });
   };
 
   return (
@@ -261,6 +276,16 @@ const Dashboard = () => {
           </div>
           <p className="text-2xl font-bold text-gray-900 dark:text-white">
             {taxaAcerto.toFixed(1)}%
+          </p>
+        </div>
+
+        <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">ROI Mensal</h3>
+            <TrendingUp className="w-5 h-5 text-blue-500" />
+          </div>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            {roiMensal.toFixed(1)}%
           </p>
         </div>
       </div>

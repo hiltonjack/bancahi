@@ -165,6 +165,9 @@ const MetodoDetalhes = () => {
           <p className="text-2xl font-bold text-gray-900">
             {apostasDoMetodo.length}
           </p>
+          <p className="text-xs text-gray-500 mt-2">
+            {apostasGanhas.length} green(s) • {apostasPerdidas.length} red(s)
+          </p>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-sm">

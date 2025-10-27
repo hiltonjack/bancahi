@@ -30,7 +30,6 @@ interface SimuladorLucroProps {
 const SimuladorLucro: React.FC<SimuladorLucroProps> = ({ aproveitamento, oddMedia }) => {
   const {
     register,
-    handleSubmit,
     watch,
     formState: { errors },
   } = useForm<SimuladorFormData>({
